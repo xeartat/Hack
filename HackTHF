@@ -1,0 +1,347 @@
+-- ============= MOBILE UI SYSTEM =============
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+local UIVisible = false
+local CurrentTab = "Combat"
+
+-- ============= CREATE GUI =============
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ExploitMenu"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+-- ============= MAIN FRAME =============
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0.9, 0, 0.8, 0)
+MainFrame.Position = UDim2.new(0.05, 0, 0.1, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.BorderSizePixel = 0
+MainFrame.Visible = false
+MainFrame.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 8)
+MainCorner.Parent = MainFrame
+
+-- ============= HEADER =============
+local Header = Instance.new("Frame")
+Header.Name = "Header"
+Header.Size = UDim2.new(1, 0, 0.1, 0)
+Header.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Header.BorderSizePixel = 0
+Header.Parent = MainFrame
+
+local HeaderCorner = Instance.new("UICorner")
+HeaderCorner.CornerRadius = UDim.new(0, 8)
+HeaderCorner.Parent = Header
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Name = "Title"
+TitleLabel.Size = UDim2.new(0.7, 0, 1, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextSize = 18
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.Text = "COUNTER BLOX EXPLOIT"
+TitleLabel.Parent = Header
+
+-- ============= CLOSE BUTTON =============
+local CloseButton = Instance.new("TextButton")
+CloseButton.Name = "CloseButton"
+CloseButton.Size = UDim2.new(0.15, 0, 1, 0)
+CloseButton.Position = UDim2.new(0.85, 0, 0, 0)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 16
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Text = "X"
+CloseButton.BorderSizePixel = 0
+CloseButton.Parent = Header
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 6)
+CloseCorner.Parent = CloseButton
+
+CloseButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    UIVisible = false
+end)
+
+-- ============= TAB BUTTONS FRAME =============
+local TabsFrame = Instance.new("Frame")
+TabsFrame.Name = "Tabs"
+TabsFrame.Size = UDim2.new(1, 0, 0.08, 0)
+TabsFrame.Position = UDim2.new(0, 0, 0.1, 0)
+TabsFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+TabsFrame.BorderSizePixel = 0
+TabsFrame.Parent = MainFrame
+
+local TabLayout = Instance.new("UIGridLayout")
+TabLayout.CellSize = UDim2.new(0.2, 0, 1, 0)
+TabLayout.Parent = TabsFrame
+
+-- ============= CREATE TABS =============
+local TabsData = {"Combat", "Visuals", "Movement", "World", "Misc"}
+local TabButtons = {}
+
+for _, tabName in ipairs(TabsData) do
+    local TabButton = Instance.new("TextButton")
+    TabButton.Name = tabName .. "Tab"
+    TabButton.BackgroundColor3 = (tabName == CurrentTab) and Color3.fromRGB(100, 150, 255) or Color3.fromRGB(50, 50, 50)
+    TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TabButton.TextSize = 12
+    TabButton.Font = Enum.Font.Gotham
+    TabButton.Text = tabName
+    TabButton.BorderSizePixel = 0
+    TabButton.Parent = TabsFrame
+    
+    TabButton.MouseButton1Click:Connect(function()
+        CurrentTab = tabName
+        
+        -- Update all tab buttons
+        for _, btn in ipairs(TabButtons) do
+            btn.BackgroundColor3 = (btn.Name == tabName .. "Tab") and Color3.fromRGB(100, 150, 255) or Color3.fromRGB(50, 50, 50)
+        end
+        
+        -- Update content frames
+        for _, content in ipairs(ContentFrame:GetChildren()) do
+            if content:IsA("Frame") then
+                content.Visible = (content.Name == tabName .. "Content")
+            end
+        end
+    end)
+    
+    table.insert(TabButtons, TabButton)
+end
+
+-- ============= CONTENT FRAME =============
+local ContentFrame = Instance.new("Frame")
+ContentFrame.Name = "Content"
+ContentFrame.Size = UDim2.new(1, 0, 0.82, 0)
+ContentFrame.Position = UDim2.new(0, 0, 0.18, 0)
+ContentFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ContentFrame.BorderSizePixel = 0
+ContentFrame.Parent = MainFrame
+
+-- ============= CREATE TAB CONTENT =============
+local function CreateTabContent(tabName)
+    local TabContent = Instance.new("Frame")
+    TabContent.Name = tabName .. "Content"
+    TabContent.Size = UDim2.new(1, 0, 1, 0)
+    TabContent.BackgroundTransparency = 1
+    TabContent.Visible = (tabName == CurrentTab)
+    TabContent.Parent = ContentFrame
+    
+    local ScrollFrame = Instance.new("ScrollingFrame")
+    ScrollFrame.Size = UDim2.new(1, 0, 1, 0)
+    ScrollFrame.BackgroundTransparency = 1
+    ScrollFrame.ScrollBarThickness = 6
+    ScrollFrame.BorderSizePixel = 0
+    ScrollFrame.Parent = TabContent
+    
+    local Layout = Instance.new("UIListLayout")
+    Layout.Padding = UDim.new(0, 8)
+    Layout.Parent = ScrollFrame
+    
+    return ScrollFrame
+end
+
+-- ============= CREATE TOGGLE ELEMENT =============
+local function CreateToggleElement(parent, label, configKey, callback)
+    local Container = Instance.new("Frame")
+    Container.Size = UDim2.new(1, -16, 0, 36)
+    Container.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Container.BorderSizePixel = 0
+    Container.Parent = parent
+    
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 6)
+    Corner.Parent = Container
+    
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(0.7, 0, 1, 0)
+    Label.BackgroundTransparency = 1
+    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Label.TextSize = 14
+    Label.Font = Enum.Font.Gotham
+    Label.Text = label
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.Parent = Container
+    
+    local ToggleButton = Instance.new("TextButton")
+    ToggleButton.Size = UDim2.new(0.25, 0, 0.8, 0)
+    ToggleButton.Position = UDim2.new(0.7, 0, 0.1, 0)
+    ToggleButton.BackgroundColor3 = Config[configKey] and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(100, 100, 100)
+    ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleButton.TextSize = 12
+    ToggleButton.Font = Enum.Font.GothamBold
+    ToggleButton.Text = Config[configKey] and "ON" or "OFF"
+    ToggleButton.BorderSizePixel = 0
+    ToggleButton.Parent = Container
+    
+    local ToggleCorner = Instance.new("UICorner")
+    ToggleCorner.CornerRadius = UDim.new(0, 4)
+    ToggleCorner.Parent = ToggleButton
+    
+    ToggleButton.MouseButton1Click:Connect(function()
+        Config[configKey] = not Config[configKey]
+        ToggleButton.BackgroundColor3 = Config[configKey] and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(100, 100, 100)
+        ToggleButton.Text = Config[configKey] and "ON" or "OFF"
+        if callback then
+            callback(Config[configKey])
+        end
+    end)
+end
+
+-- ============= CREATE SLIDER ELEMENT =============
+local function CreateSliderElement(parent, label, configKey, min, max, step)
+    local Container = Instance.new("Frame")
+    Container.Size = UDim2.new(1, -16, 0, 70)
+    Container.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Container.BorderSizePixel = 0
+    Container.Parent = parent
+    
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 6)
+    Corner.Parent = Container
+    
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(1, -8, 0, 20)
+    Label.Position = UDim2.new(0, 4, 0, 4)
+    Label.BackgroundTransparency = 1
+    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Label.TextSize = 12
+    Label.Font = Enum.Font.Gotham
+    Label.Text = label .. ": " .. math.floor(Config[configKey])
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.Parent = Container
+    
+    local SliderBar = Instance.new("Frame")
+    SliderBar.Size = UDim2.new(1, -8, 0, 8)
+    SliderBar.Position = UDim2.new(0, 4, 0, 28)
+    SliderBar.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    SliderBar.BorderSizePixel = 0
+    SliderBar.Parent = Container
+    
+    local SliderCorner = Instance.new("UICorner")
+    SliderCorner.CornerRadius = UDim.new(0, 4)
+    SliderCorner.Parent = SliderBar
+    
+    local SliderFill = Instance.new("Frame")
+    local percent = (Config[configKey] - min) / (max - min)
+    SliderFill.Size = UDim2.new(percent, 0, 1, 0)
+    SliderFill.BackgroundColor3 = Color3.fromRGB(100, 200, 100)
+    SliderFill.BorderSizePixel = 0
+    SliderFill.Parent = SliderBar
+    
+    local FillCorner = Instance.new("UICorner")
+    FillCorner.CornerRadius = UDim.new(0, 4)
+    FillCorner.Parent = SliderFill
+    
+    local InputBox = Instance.new("TextBox")
+    InputBox.Size = UDim2.new(1, -8, 0, 20)
+    InputBox.Position = UDim2.new(0, 4, 0, 40)
+    InputBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    InputBox.TextColor3 = Color3.fromRGB(200, 200, 200)
+    InputBox.TextSize = 12
+    InputBox.Font = Enum.Font.Gotham
+    InputBox.Text = tostring(math.floor(Config[configKey]))
+    InputBox.BorderSizePixel = 1
+    InputBox.BorderColor3 = Color3.fromRGB(80, 80, 80)
+    InputBox.Parent = Container
+    
+    InputBox.FocusLost:Connect(function()
+        local value = tonumber(InputBox.Text) or Config[configKey]
+        value = math.max(min, math.min(max, value))
+        value = math.round(value / step) * step
+        
+        Config[configKey] = value
+        InputBox.Text = tostring(math.floor(value))
+        
+        local newPercent = (value - min) / (max - min)
+        SliderFill.Size = UDim2.new(newPercent, 0, 1, 0)
+        Label.Text = label .. ": " .. math.floor(value)
+    end)
+end
+
+-- ============= POPULATE TABS =============
+
+-- Combat Tab
+local CombatContent = CreateTabContent("Combat")
+CreateToggleElement(CombatContent, "Aimbot", "Aimbot_Enabled")
+CreateToggleElement(CombatContent, "Sticky Aim", "Sticky_Aim")
+CreateToggleElement(CombatContent, "Aim Prediction", "Aim_Prediction")
+CreateToggleElement(CombatContent, "Visibility Check", "Visible_Check")
+CreateSliderElement(CombatContent, "FOV Size", "Aimbot_FOV", 20, 500, 10)
+CreateSliderElement(CombatContent, "Max Distance", "Aimbot_Distance", 500, 5000, 100)
+CreateSliderElement(CombatContent, "Smoothness", "Aimbot_Smoothness", 1, 50, 1)
+CreateSliderElement(CombatContent, "Prediction", "Prediction_Amount", 0.05, 0.5, 0.01)
+
+-- Visuals Tab
+local VisualsContent = CreateTabContent("Visuals")
+CreateToggleElement(VisualsContent, "ESP Enabled", "ESP_Enabled")
+CreateToggleElement(VisualsContent, "Boxes", "ESP_Boxes")
+CreateToggleElement(VisualsContent, "Names", "ESP_Names")
+CreateToggleElement(VisualsContent, "Distance", "ESP_Distance")
+CreateToggleElement(VisualsContent, "Health Bars", "ESP_Health")
+CreateToggleElement(VisualsContent, "Skeleton", "ESP_Skeleton")
+CreateToggleElement(VisualsContent, "Tracers", "ESP_Tracers")
+CreateToggleElement(VisualsContent, "Head Dot", "ESP_HeadDot")
+CreateSliderElement(VisualsContent, "ESP Max Distance", "ESP_MaxDistance", 500, 5000, 100)
+
+-- Movement Tab
+local MovementContent = CreateTabContent("Movement")
+CreateToggleElement(MovementContent, "Speed Hack", "Speed_Enabled")
+CreateSliderElement(MovementContent, "Speed Value", "Speed_Value", 16, 200, 2)
+CreateToggleElement(MovementContent, "Jump Power", "Jump_Power")
+CreateSliderElement(MovementContent, "Jump Value", "Jump_Value", 50, 200, 5)
+CreateToggleElement(MovementContent, "Infinite Jump", "Infinite_Jump")
+CreateToggleElement(MovementContent, "BunnyHop", "BunnyHop_Enabled")
+CreateToggleElement(MovementContent, "Fly", "Fly_Enabled")
+CreateSliderElement(MovementContent, "Fly Speed", "Fly_Speed", 10, 200, 5)
+
+-- World Tab
+local WorldContent = CreateTabContent("World")
+CreateToggleElement(WorldContent, "FOV Changer", "FOV_Changer")
+CreateSliderElement(WorldContent, "FOV Value", "FOV_Value", 70, 120, 1)
+CreateToggleElement(WorldContent, "Third Person", "ThirdPerson_Enabled")
+CreateSliderElement(WorldContent, "Camera Distance", "ThirdPerson_Distance", 5, 50, 1)
+CreateToggleElement(WorldContent, "Fullbright", "Fullbright")
+CreateToggleElement(WorldContent, "Remove Fog", "Remove_Fog")
+
+-- Misc Tab
+local MiscContent = CreateTabContent("Misc")
+CreateToggleElement(MiscContent, "Team Check", "Team_Check")
+CreateToggleElement(MiscContent, "Anti AFK", "Anti_AFK")
+
+-- ============= TOGGLE MENU BUTTON =============
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "ToggleMenuButton"
+ToggleButton.Size = UDim2.new(0, 60, 0, 60)
+ToggleButton.Position = UDim2.new(0.05, 0, 0.05, 0)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(100, 150, 255)
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextSize = 18
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.Text = ">"
+ToggleButton.BorderSizePixel = 0
+ToggleButton.Parent = ScreenGui
+
+local ButtonCorner = Instance.new("UICorner")
+ButtonCorner.CornerRadius = UDim.new(0, 8)
+ButtonCorner.Parent = ToggleButton
+
+ToggleButton.MouseButton1Click:Connect(function()
+    UIVisible = not UIVisible
+    MainFrame.Visible = UIVisible
+    ToggleButton.Text = UIVisible and "<" or ">"
+end)
+
+print("[UI LOADED] Press menu button to open/close (bottom left)")
